@@ -1,0 +1,50 @@
+int motorStatus1 = 9; 
+int motorStatus2 = 10;
+int voltageSign1 = 7;  
+int voltageSign1 = 8;  
+int button = 4; 
+int flagIndicator = 12; 
+
+boolean buttonState = LOW; 
+int rotDirection = 0; 
+int pressed = false; 
+
+void setup() {
+  // put your setup code here, to run once:
+pinMode (motorStatus1, OUTPUT); 
+pinMode (motorStatus1, OUTPUT); 
+pinMode (voltageSign1, OUTPUT); 
+pinMode(voltageSign2, OUTPUT); 
+pinMode(button, OUTPUT); 
+pinMode (flagIndicator, INPUT); 
+
+analogWrite(voltageSign1, 255); 
+analogWrite(voltageSign2, 255);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  int potValie = analogRead(A0); 
+  int pwmOutput = map(potValue, 0, 1023, 0, 255); 
+  analogWrite(motorStatus1, pwmOutput); 
+
+  if (digitalRead(button) == true) { 
+    pressed = !pressed ; 
+  }
+  while (digitalRead(button) == true); 
+    delay(20);
+
+ if (pressed == true & rotDirection == 0) { 
+  analogWrite(voltageSign1, 255); 
+  digitalWrite(voltageSign2, LOW); 
+  rotDirection = 1; 
+  delay(20);    
+ }
+ if ( pressed == false & rotDirection == 1) { 
+  digitalWrite(voltageSign1, LOW); 
+  digitalWrite(voltageSign2, HIGH); 
+  rotDirection = 0; 
+  delay(20); 
+ }
+}
+
