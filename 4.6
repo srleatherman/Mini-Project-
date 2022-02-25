@@ -1,52 +1,73 @@
 
+
 #define outputA 6
 #define outputB 7
+#define motorVoltage 4
 int counter = 0;
 int aState;
 int aLastState;
-int angularVelocity;
+int overallTime; 
 int startTime;
+  int angularVelocity;
+   int time_elapsed;
+   int startPosition = counter;
+   int finishPosition;
+  int FIXED_CYCLE_TIME = 10; // unit is in ms
+  int pi = 3.1415; // known constant
+ int cpr = 3200; // known from the motor data sheet
+
+
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(250000);
+ Serial.begin(19200);
  
   pinMode(outputA, INPUT_PULLUP);
   pinMode(outputB, INPUT_PULLUP);
+  pinMode(motorVoltage, OUTPUT);
+  analogWrite(motorVoltage, LOW);
   aLastState = digitalRead(outputA);
+  overallTime = millis();
+
 }
 
 void loop() {
-  
   // put your main code here, to run repeatedly:
-    int angularVelocity;
-    int startTime;
-    int time_elapsed;
-    int startPosition = counter;
-    int finishPosition;
-    const int FIXED_CYCLE_TIME = 10; // unit is in ms
-    const int pi = 3.1415;
-    const int cpr = 3200;
-    startTime = millis();
-  while(millis() < (startTime + FIXED_CYCLE_TIME)
-  ){
+  
+  startTime = millis();
+  if(millis()<(startTime + FIXED_CYCLE_TIME)){
+    
     aState = digitalRead(outputA); // reads the "current" state of outputA
-    if(aState != aLastState){
+     if(aState != aLastState){
+      //if state of a has changed then there has been a change in position
+      // if the state of b is different than the state of a, it has turned clockwise
       if(digitalRead(outputB) != aState){
         counter ++;
+        // if the state of b is the same as b, then it has turned counterclockwise
       } else{
         counter --;
       }
     }
+    
   }
   time_elapsed = millis();
+ 
   finishPosition = counter;
-  angularVelocity = (finishPosition*2*pi/cpr - startPosition*2*pi/cpr)/(FIXED_CYCLE_TIME/1000);
-  while(millis()<2000){
+  //the equation for angularVelocity is final angle - start angle/ time
+  //the equation angle from counts is counts*2*pi/counts per rotation
+  //FIXED_CYCLE_TIME is divided by 1000 because I need to change ms to seconds.
+  //the final units are rads/sec
+  angularVelocity = (finishPosition*2*pi/(float)cpr - startPosition*2*pi/(float)cpr)/((float)FIXED_CYCLE_TIME/1000);
+
+  
+  if(overallTime<2000){
     Serial.println(angularVelocity);
+    if(overallTime >1000){
+      //set motor voltage to desired positve value
+      analogWrite(motorVoltage, HIGH);
+    }
   }
-  aLastState =aState;
+  aLastState = aState;
   if ((time_elapsed-startTime) > FIXED_CYCLE_TIME){
     Serial.println("ERROR: the main function takes longer than the desired sampling rate");  
   }
-
 }
