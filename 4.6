@@ -1,0 +1,52 @@
+
+#define outputA 6
+#define outputB 7
+int counter = 0;
+int aState;
+int aLastState;
+int angularVelocity;
+int startTime;
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(250000);
+ 
+  pinMode(outputA, INPUT_PULLUP);
+  pinMode(outputB, INPUT_PULLUP);
+  aLastState = digitalRead(outputA);
+}
+
+void loop() {
+  
+  // put your main code here, to run repeatedly:
+    int angularVelocity;
+    int startTime;
+    int time_elapsed;
+    int startPosition = counter;
+    int finishPosition;
+    const int FIXED_CYCLE_TIME = 10; // unit is in ms
+    const int pi = 3.1415;
+    const int cpr = 3200;
+    startTime = millis();
+  while(millis() < (startTime + FIXED_CYCLE_TIME)
+  ){
+    aState = digitalRead(outputA); // reads the "current" state of outputA
+    if(aState != aLastState){
+      if(digitalRead(outputB) != aState){
+        counter ++;
+      } else{
+        counter --;
+      }
+    }
+  }
+  time_elapsed = millis();
+  finishPosition = counter;
+  angularVelocity = (finishPosition*2*pi/cpr - startPosition*2*pi/cpr)/(FIXED_CYCLE_TIME/1000);
+  while(millis()<2000){
+    Serial.println(angularVelocity);
+  }
+  aLastState =aState;
+  if ((time_elapsed-startTime) > FIXED_CYCLE_TIME){
+    Serial.println("ERROR: the main function takes longer than the desired sampling rate");  
+  }
+
+}
