@@ -24,10 +24,12 @@ int duration;
 int FIXED_CYCLE_TIME = 10; // unit is in ms
 float pi = 3.1415; // known constant
 int cpr = 3200; // known from the motor data sheet
-float desiredAngle = pi;
+float desiredAngle;
+String data;
+bool DataRead;
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(19200);
+  Serial.begin(115200);
    
   pinMode(button, OUTPUT);
   digitalWrite(button, HIGH);
@@ -36,7 +38,7 @@ void setup() {
   digitalWrite(signOfVoltage, HIGH);
   
   pinMode(motorVoltage, OUTPUT);
-  analogWrite(motorVoltage, 0);
+  //analogWrite(motorVoltage, 0);
   
   pinMode(flagIndicator, INPUT);
   
@@ -47,7 +49,51 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   startTime = millis();
+  int dataInt = data.toInt();
+  switch (dataInt) {
+
+  case 1:
+
+     desiredAngle =  (2*pi) - currentAngle;
+
+    break;
+
+  case 2:
+
+    desiredAngle =  ((3*pi)/2) - currentAngle;
+
+    break;
+
+  case 3:
+
+    desiredAngle =  (pi) - currentAngle; 
+
+    break;
+
+  case 4:
+
+    desiredAngle =  (pi/2) - currentAngle;
+
+    break;
+
+  default:
+
+    desiredAngle = (2*pi) - currentAngle;
+
+    break;
+
+} 
+  if (DataRead) {
+
  
+
+  //Serial.print("You sent me: "); //send back confrmation
+
+  //Serial.println(data);
+
+  DataRead = false;
+
+}
   currentCounts = myEnc.read(); // 
   //Serial.print(currentCounts);
   //Serial.print('\t');
@@ -59,8 +105,8 @@ void loop() {
   //startAngle = (float)startPosition*2*pi/(float)cpr;
   angularVelocity = (float)1000*(currentAngle-startAngle)/((float)(startTime - duration));
   controller(desiredAngle, currentAngle, angularVelocity);
-  Serial.print(desiredAngle - currentAngle);
-  Serial.println('\t');
+  //Serial.print(desiredAngle - currentAngle);
+  //Serial.println('\t');
   //startPosition = currentAngle;
   duration = startTime;// sets the start positon to the finish position for the next iteration
   overallTime = millis();
@@ -74,16 +120,16 @@ void loop() {
   //delay(FIXED_CYCLE_TIME - (overallTime - startTime));
   delay(10);
   if ((overallTime - startTime) > FIXED_CYCLE_TIME){
-    Serial.println("ERROR: the main function takes longer than the desired sampling rate");  
+    //Serial.println("ERROR: the main function takes longer than the desired sampling rate");  
   }
 }
 void controller(float desiredAngle,float currentAngle, float angularVelocity){
   desiredVoltage = (float)Kp*(desiredAngle - currentAngle);
-  Serial.print(desiredVoltage);
-  Serial.print('\t');
+  //Serial.print(desiredVoltage);
+  //Serial.print('\t');
   desiredVoltagePWM = (float)desiredVoltage*255/7.5;
-  Serial.print(desiredVoltagePWM);
-  Serial.print('\t');
+  //Serial.print(desiredVoltagePWM);
+  //Serial.print('\t');
   //Serial.println(desiredVoltagePWM);
   if( desiredVoltagePWM <0){
     digitalWrite(signOfVoltage,false);
@@ -97,4 +143,17 @@ void controller(float desiredAngle,float currentAngle, float angularVelocity){
     
   analogWrite(motorVoltage, controlSignal);
   startPosition = currentAngle;
+}
+void serialEvent(){ // waits for a input from the usb
+
+if (Serial.available() > 0) {
+
+  data = Serial.readStringUntil('\n'); //sets the sent data as a variable
+
+  DataRead = true;
+
+}
+
+Serial.flush(); //clears the data
+
 }
