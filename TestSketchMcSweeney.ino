@@ -49,51 +49,9 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   startTime = millis();
-  int dataInt = data.toInt();
-  switch (dataInt) {
-
-  case 1:
-
-     desiredAngle =  (2*pi) - currentAngle;
-
-    break;
-
-  case 2:
-
-    desiredAngle =  ((3*pi)/2) - currentAngle;
-
-    break;
-
-  case 3:
-
-    desiredAngle =  (pi) - currentAngle; 
-
-    break;
-
-  case 4:
-
-    desiredAngle =  (pi/2) - currentAngle;
-
-    break;
-
-  default:
-
-    desiredAngle = (2*pi) - currentAngle;
-
-    break;
-
-} 
-  if (DataRead) {
-
- 
-
-  //Serial.print("You sent me: "); //send back confrmation
-
-  //Serial.println(data);
-
-  DataRead = false;
-
-}
+  
+  switchFunction(); 
+  
   currentCounts = myEnc.read(); // 
   //Serial.print(currentCounts);
   //Serial.print('\t');
@@ -102,6 +60,7 @@ void loop() {
   //FIXED_CYCLE_TIME is divided by 1000 because I need to change ms to seconds.
   //the final units are rads/sec
   currentAngle = (float)currentCounts*2*pi/(float)cpr;
+  //Serial.print(currentAngle);
   //startAngle = (float)startPosition*2*pi/(float)cpr;
   angularVelocity = (float)1000*(currentAngle-startAngle)/((float)(startTime - duration));
   controller(desiredAngle, currentAngle, angularVelocity);
@@ -157,3 +116,32 @@ if (Serial.available() > 0) {
 Serial.flush(); //clears the data
 
 }
+void switchFunction() { 
+     if(data == "1"){
+       Serial.println("1");
+       desiredAngle =  (2*pi);
+  
+    }
+    if(data == "2"){
+      Serial.println("2");
+      desiredAngle =  ((3*pi)/2);
+  
+    }
+    if(data == "3"){
+      Serial.println("3");
+      desiredAngle =  (pi); 
+  
+    }
+  
+    if(data == "4"){
+      Serial.println("4");
+      desiredAngle =  (pi/2);
+  
+    }
+  
+    else {
+      Serial.println("none");
+      desiredAngle = (2*pi);
+  
+    }
+  }
