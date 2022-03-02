@@ -5,3 +5,6 @@ data on our computers. This will also help as we continue to work on this projec
 
 Organization: 
 Each of our projects and demos will have their own repository to keep things separated. 
+
+Mini Project: 
+We have seperate files for each section of the code and then the entire file for Arduino and Pi codes so that they can be run by downloading the information.  
